@@ -5,14 +5,13 @@
 int main()
 {
     auto win = webui::window();
-    
-    win.set_size(640, 480);
-    win.bind("greet", [](webui::window::event* e){
-        std::cout << "Hello there: " << e->get_string(0) <<std::endl;
-    });
+    std::string html_main(
+        _binary_res_main_html_start, 
+        _binary_res_main_html_len
+    );
 
     win.show_browser(
-        _binary_res_main_html_start,
+        html_main,
         1
     );
     webui_wait();
