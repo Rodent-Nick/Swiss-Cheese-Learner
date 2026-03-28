@@ -24,11 +24,14 @@
         }
 
         function split_word() {
-            const words = text_buf.split(/\s+/);
-            buf_dirty = false;
-            return words || [];
+            const word_iter = text_buf.matchAll(/\w+|\s|\W/gm);
+            let words = [];
+            for (const word of word_iter) {
+                words.push(word);
+            }
+            return words;
         }
-        
+
         function update_textfield() {
             const container = document.getElementById('text-container');
 
@@ -44,43 +47,53 @@
             const words = split_word(text_buf);
 
             words.forEach(word => {
-                const span = document.createElement('span');
-                span.textContent = word;
-                span.className = "word";
-                span.setAttribute('data-original', word);
-                span.setAttribute('data-masked', false);
-                span.addEventListener('click', function () {
-                    const is_masked =
-                        this.getAttribute('data-masked') === 'true';
-                    const org_word = this.getAttribute('data-original');
+                /// There are two types of `word`, one is actual word, another
+                /// is punctuation or whitespace. 
 
-                    if (is_masked) {
-                        this.textContent = org_word;
-                        this.setAttribute('data-masked', false);
-                    } else {
-                        const masked_text =
-                            placeholder.repeat(org_word.length)
-                        this.textContent = masked_text;
-                        this.setAttribute('data-masked', true);
-                    }
+                const is_not_actual_word = new RegExp(/^[\W]{1}$/gmv);
+                const result = is_not_actual_word.test(word);
 
-                });
-                container.appendChild(span);
-                container.appendChild(document.createTextNode(' '));
+                if (!result) {
+                    const span = document.createElement('span');
+                    span.textContent = word;
+                    span.className = "word";
+                    span.setAttribute('data-original', word);
+                    span.setAttribute('data-masked', false);
+                    span.addEventListener('click', function () {
+                        const is_masked =
+                            this.getAttribute('data-masked') === 'true';
+                        const org_word = this.getAttribute('data-original');
+
+                        if (is_masked) {
+                            this.textContent = org_word;
+                            this.setAttribute('data-masked', false);
+                        } else {
+                            const masked_text =
+                                placeholder.repeat(org_word.length)
+                            this.textContent = masked_text;
+                            this.setAttribute('data-masked', true);
+                        }
+
+                    });
+                    container.appendChild(span);
+                } else {
+                    container.appendChild(document.createTextNode(word));
+                }
             });
 
         }
 
         // Listener binding after load completed.
-        document.addEventListener('DOMContentLoaded', function(){
+        document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('submitText').addEventListener(
-            'click',
-            function () {
-                const ta = document.getElementById('userText')
-                text_buf = ta.value;
-                update_textfield();
-            }
-        )
+                'click',
+                function () {
+                    const ta = document.getElementById('userText')
+                    text_buf = ta.value;
+                    buf_dirty = true;
+                    update_textfield();
+                }
+            )
         });
     </script>
     <style>
@@ -88,6 +101,7 @@
             font-family: Arial, sans-serif;
             font-size: 16px;
             line-height: 1.5;
+            user-select: none;
         }
 
         .word {
@@ -107,17 +121,19 @@
 
     <div class="container py-5">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-md-10 col-lg-10">
                 <div id="text-container" class="text-break fs-4 mb-4 
                     p-3 bg-white border rounded shadow-sm">
-
+                    NO TEXT
                 </div>
             </div>
+
+            <button type="button" class="btn btn-primary m-3 col-md-2" id="ent" data-bs-toggle="modal"
+                data-bs-target="#textModal">
+                Update Original Text
+            </button>
         </div>
 
-        <button type="button" class="btn btn-primary m-3" id="ent" data-bs-toggle="modal" data-bs-target="#textModal">
-            Update Original Text
-        </button>
     </div>
 
     <div class="modal fade" id="textModal" tabindex="-1" aria-hidden="true">
