@@ -19,30 +19,30 @@
         let buf_dirty = true;
         let placeholder = '*';
 
-        function is_string_null(string){
+        function is_string_null(string) {
             return string === null || string === undefined || string === "";
         }
 
-        function split_word(){
+        function split_word() {
             const words = text_buf.split(/\s+/);
             buf_dirty = false;
             return words || [];
         }
-
-        function update_textfield(){
+        
+        function update_textfield() {
             const container = document.getElementById('text-container');
-            
+
             if (is_string_null(text_buf) || !buf_dirty) {
                 return; // But why call it ...
             }
 
             // A clean slate
-            while(container.firstChild) {
+            while (container.firstChild) {
                 container.removeChild(container.firstChild);
             }
 
             const words = split_word(text_buf);
-            
+
             words.forEach(word => {
                 const span = document.createElement('span');
                 span.textContent = word;
@@ -50,7 +50,7 @@
                 span.setAttribute('data-original', word);
                 span.setAttribute('data-masked', false);
                 span.addEventListener('click', function () {
-                    const is_masked = 
+                    const is_masked =
                         this.getAttribute('data-masked') === 'true';
                     const org_word = this.getAttribute('data-original');
 
@@ -58,7 +58,7 @@
                         this.textContent = org_word;
                         this.setAttribute('data-masked', false);
                     } else {
-                        const masked_text = 
+                        const masked_text =
                             placeholder.repeat(org_word.length)
                         this.textContent = masked_text;
                         this.setAttribute('data-masked', true);
@@ -70,6 +70,18 @@
             });
 
         }
+
+        // Listener binding after load completed.
+        document.addEventListener('DOMContentLoaded', function(){
+            document.getElementById('submitText').addEventListener(
+            'click',
+            function () {
+                const ta = document.getElementById('userText')
+                text_buf = ta.value;
+                update_textfield();
+            }
+        )
+        });
     </script>
     <style>
         #text-container {
@@ -103,9 +115,8 @@
             </div>
         </div>
 
-        <button type="button" class="btn btn-primary m-3" id="ent"
-        data-bs-toggle="modal" data-bs-target="#textModal">
-        Update Original Text
+        <button type="button" class="btn btn-primary m-3" id="ent" data-bs-toggle="modal" data-bs-target="#textModal">
+            Update Original Text
         </button>
     </div>
 
@@ -116,34 +127,21 @@
                     <h5 class="modal-title">Update Original Text</h5>
                 </div>
                 <div class="modal-body">
-                    
+
                     <p>
                         Enter the original text below. Currently, only English
                         is supported.
                     </p>
-                    <textarea class="form-control" 
-                    rows="5" id="userText"></textarea>
+                    <textarea class="form-control" rows="5" id="userText"></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" 
-                    data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" 
-                    id="submitText" data-bs-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitText"
+                        data-bs-dismiss="modal">Submit</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('submitText').addEventListener(
-            'click',
-            function(){
-                const ta = document.getElementById('userText')
-                text_buf = ta.value;
-                update_textfield();
-            }
-        )
-    </script>
 
 </body>
 
