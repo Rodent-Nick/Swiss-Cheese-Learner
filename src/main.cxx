@@ -9,7 +9,7 @@ int main()
         _binary_res_main_html_start, 
         _binary_res_main_html_len
     );
-    win.set_kiosk(true);
+    // win.set_kiosk(true);
 
     win.show_browser(
         html_main,
