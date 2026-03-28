@@ -77,10 +77,87 @@
                     });
                     container.appendChild(span);
                 } else {
-                    container.appendChild(document.createTextNode(word));
+                    if (word != "\n") {
+                        container.appendChild(document.createTextNode(word));
+                    } else {
+                        container.appendChild(document.createElement('br'));
+                    }
                 }
             });
 
+        }
+
+        function mask_text(mode) {
+            const container = document.getElementById('text-container');
+            let interval = true;
+            let children = container.children;
+            switch (mode) {
+                case 0:
+                    interval = true;
+                    for (let child of children) {
+                        let s = child;
+                        if (s.nodeName.toLowerCase() != 'span') {
+                            continue;
+                        }
+                        let w_org = s.getAttribute('data-original');
+                        if (interval) {
+                            const masked_text =
+                                placeholder.repeat(w_org.length);
+                            s.textContent = masked_text;
+                            s.setAttribute('data-masked', true);
+                            interval = false;
+                        } else {
+                            s.textContent = w_org;
+                            s.setAttribute('data-masked', false);
+                            interval = true;
+                        }
+                    }
+                    break;
+                case 1:
+                    interval = false;
+                    for (let child of children) {
+                        let s = child;
+                        if (s.nodeName.toLowerCase() != 'span') {
+                            continue;
+                        }
+                        let w_org = s.getAttribute('data-original');
+                        if (interval) {
+                            const masked_text =
+                                placeholder.repeat(w_org.length);
+                            s.textContent = masked_text;
+                            s.setAttribute('data-masked', true);
+                            interval = false;
+                        } else {
+                            s.textContent = w_org;
+                            s.setAttribute('data-masked', false);
+                            interval = true;
+                        }
+                    }
+                    break;
+                case 2:
+                    for (let child of children) {
+                        let s = child;
+                        if (s.nodeName.toLowerCase() != 'span') {
+                            continue;
+                        }
+                        let w_org = s.getAttribute('data-original');
+                        const masked_text = placeholder.repeat(w_org.length);
+                        s.textContent = masked_text;
+                        s.setAttribute('data-masked', true);
+                    }
+                    break;
+                case 3:
+                    for (let child of children) {
+                        let s = child;
+                        if (s.nodeName.toLowerCase() != 'span') {
+                            continue;
+                        }
+                        let w_org = s.getAttribute('data-original');
+                        s.textContent = w_org;
+                        s.setAttribute('data-masked', false);
+                    }
+                    break;
+            }
         }
 
         // Listener binding after load completed.
@@ -121,15 +198,32 @@
 
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" 
-                href="https://github.com/Rodent-Nick/Swiss-Cheese-Learner">
-            <b><u>Swiss Cheese Learner</u></b>
+            <a class="navbar-brand" href="https://github.com/Rodent-Nick/Swiss-Cheese-Learner">
+                <b><u>Swiss Cheese Learner</u></b>
             </a>
             <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <button class="btn m-3 text-white dropdown-toggle" data-bs-toggle="dropdown">
+                        Apply Mask Pattern
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="javascript:mask_text(0);">
+                                Interval (A)
+                            </a></li>
+                        <li><a class="dropdown-item" href="javascript:mask_text(1);">
+                                Interval (B)
+                            </a></li>
+                        <li><a class="dropdown-item" href="javascript:mask_text(2);">
+                                All Masked
+                            </a></li>
+                        <li><a class="dropdown-item" href="javascript:mask_text(3);">
+                                All Clear
+                            </a></li>
+                    </ul>
+                </li>
                 <li class="nav-item">
-                    <button class="btn m-3 bg-light" id="ent"
-                        data-bs-toggle="modal" data-bs-target="#textModal">
-                    Update Text
+                    <button class="btn m-3 bg-light" id="ent" data-bs-toggle="modal" data-bs-target="#textModal">
+                        Update Text
                     </button>
                 </li>
             </ul>
@@ -151,7 +245,7 @@
                 data-bs-toggle="modal" data-bs-target="#textModal">
                 Update Original Text
             </button> -->
-        </div>
+    </div>
 
     </div>
 
@@ -171,8 +265,7 @@
                     <textarea class="form-control" rows="5" id="userText"></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" 
-                        data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="submitText"
                         data-bs-dismiss="modal">Submit</button>
                 </div>
